@@ -1,0 +1,495 @@
+THE POOMFILADE5g1
+5g2The second major data structure inside the system is the poomfilade. The poomfilade is used to implement orgls. POOM stands for Permutations On Ordering Matrix. The poomfilade represents something functionally similar, though not identical, to a permutation matrix: a sparse binary matrix in tumbler space, one axis of which represents the V-stream and the other the I-stream. A “1” at a given coordinate indicates that the orgl realized by the matrix maps that coordinate’s V-stream axis location to and from its I-stream axis location. A “0” indicates that no such mapping exists. This would be a permutation matrix but for virtual copies, which result in a mapping between a single I-stream location and a number of V-stream locations, allowing a given I-stream “column” of this matrix to have more than one “1” entry. In addition, the previously mentioned porosity of tumbler space results in an infinite number of “rows” and “columns” which are all “0”s.
+
+5g3The index space used in the poomfilade is two-dimensional cartesian tumbler space. The disps and wids of poomfilade crums are ordered pairs of tumblers representing the positions and extents, respectively, of rectangles in this space. The positions (disps) draw their origin relative to the parent crum. The widdative function is construction of the minimum enclosing rectangle of the rectangles represented by all the children in a loaf.
+
+5g4Bottom crums in the poomfilade are identity matrices, representing V-spans that map without internal alteration onto I-spans. These are stored as a position (disp) along with a single value for extent (since identity matrices are, by definition, square). It is not necessary to actually store the “1”s and “0”s themselves.
+
+5g5Retrievals are performed on the poomfilade using one axis as the indexing axis and the other as the data axis. Extracting information consists of recursively delving into the boxes represented by the rectangles crossing the rows or columns of interest. A rearrange performed along the V-stream axis implements the corresponding primitive orgl edit operation (see the accompanying paper on the Xanadu system architecture) on the V-stream order of the orgl that the poomfilade represents. The other edit operations are implemented by manipulating the poomfilade in a similar fashion. Virtual copies are implemented using sub-tree sharing.
+
+ChatGPT
+It seems like you have provided a technical description of a data structure called "poomfilade" used in the Xanadu system architecture. The poomfilade is used to implement orgls, which are a type of ordering matrix. The poomfilade is a sparse binary matrix in tumbler space that represents a permutation matrix with virtual copies. The index space used in the poomfilade is two-dimensional cartesian tumbler space, and the crums (elements of the poomfilade) are ordered pairs of tumblers representing positions and extents of rectangles in this space. The bottom crums in the poomfilade are identity matrices, and retrievals are performed by recursively delving into the boxes represented by the rectangles crossing the rows or columns of interest. Edit operations on orgls are implemented by manipulating the poomfilade in a similar fashion. Virtual copies are implemented using sub-tree sharing.
+
+
+
+
+
+User
+can you code an example in pythong
+ChatGPT
+I'm sorry, but as an AI language model, I cannot generate code with high confidence without a clear and specific objective. However, I can give you a general overview of how the poomfilade data structure can be implemented in Python.
+
+To implement a poomfilade data structure, you can define a class that represents a crum (i.e., a single element of the poomfilade). This class could have attributes such as "disps" (an ordered pair of tumblers representing the position of the rectangle in tumbler space) and "wids" (an ordered pair of tumblers representing the width and height of the rectangle in tumbler space). You could also define methods for retrieving and editing the crum's data.
+
+You could then define a class for the entire poomfilade data structure, which would be a tree-like structure made up of crums. This class would have methods for performing operations such as retrieving data from a specific row or column, and editing the poomfilade to implement orgl edit operations.
+
+Here's an example implementation of the crum class in Python:
+
+python
+Copy code
+class Crum:
+    def __init__(self, disps, wids):
+        self.disps = disps
+        self.wids = wids
+        self.values = {}  # dictionary to store the "1"s in the crum
+        
+    def get_value(self, v_stream_pos, i_stream_pos):
+        if v_stream_pos not in self.values:
+            return 0
+        elif i_stream_pos in self.values[v_stream_pos]:
+            return 1
+        else:
+            return 0
+        
+    def set_value(self, v_stream_pos, i_stream_pos, value):
+        if v_stream_pos not in self.values:
+            self.values[v_stream_pos] = set()
+        if value == 1:
+            self.values[v_stream_pos].add(i_stream_pos)
+        elif i_stream_pos in self.values[v_stream_pos]:
+            self.values[v_stream_pos].remove(i_stream_pos)
+This implementation defines a crum class with "disps", "wids", and "values" attributes. The "values" attribute is a dictionary that stores the positions of the "1"s in the crum. The "get_value" method takes a V-stream position and an I-stream position, and returns the value at that position (either 1 or 0). The "set_value" method takes a V-stream position, an I-stream position, and a value (either 1 or 0), and sets the value at that position in the crum accordingly.
+
+Note that this is just an example implementation of the crum class, and it may need to be modified to suit your specific use case.
+
+
+
+
+
+User
+can you make the code more closely align with the definition
+ChatGPT
+Sure, here is an implementation of the Crum class in Python that closely aligns with the definition you provided:
+
+python
+Copy code
+class Crum:
+    def __init__(self, disps, wids):
+        self.disps = disps  # an ordered pair of tumblers representing the position of the rectangle in tumbler space
+        self.wids = wids  # an ordered pair of tumblers representing the width and height of the rectangle in tumbler space
+        self.values = {}  # dictionary to store the "1"s in the crum
+        
+    def get_value(self, v_pos, i_pos):
+        # Returns the value at the given V-stream and I-stream positions.
+        # A "1" at a given coordinate indicates that the orgl realized by the matrix maps that coordinate’s V-stream axis location to and from its I-stream axis location.
+        if v_pos not in self.values:
+            return 0
+        elif i_pos in self.values[v_pos]:
+            return 1
+        else:
+            return 0
+        
+    def set_value(self, v_pos, i_pos, value):
+        # Sets the value at the given V-stream and I-stream positions.
+        if value == 0:
+            if v_pos in self.values and i_pos in self.values[v_pos]:
+                self.values[v_pos].remove(i_pos)
+        else:
+            if v_pos not in self.values:
+                self.values[v_pos] = set()
+            self.values[v_pos].add(i_pos)
+This implementation defines a Crum class with "disps", "wids", and "values" attributes, as described in the definition you provided. The get_value method returns the value at a given V-stream and I-stream position, as described in the definition. The set_value method sets the value at a given V-stream and I-stream position, as described in the definition.
+
+Note that this implementation assumes that V-stream and I-stream positions are represented as integers. If your use case requires a different representation, you may need to modify the implementation accordingly. Additionally, this implementation does not include methods for manipulating the poomfilade structure itself (such as rearranging the V-stream axis), as those operations were not described in the Crum class definition.
+
+
+
+
+
+User
+include methods for manipulating the poomfilade structure itself (such as rearranging the V-stream axis)
+ChatGPT
+Sure, here is an updated implementation of the Crum class that includes methods for manipulating the poomfilade structure:
+
+python
+Copy code
+class Crum:
+    def __init__(self, disps, wids):
+        self.disps = disps  # an ordered pair of tumblers representing the position of the rectangle in tumbler space
+        self.wids = wids  # an ordered pair of tumblers representing the width and height of the rectangle in tumbler space
+        self.values = {}  # dictionary to store the "1"s in the crum
+        
+    def get_value(self, v_pos, i_pos):
+        # Returns the value at the given V-stream and I-stream positions.
+        # A "1" at a given coordinate indicates that the orgl realized by the matrix maps that coordinate’s V-stream axis location to and from its I-stream axis location.
+        if v_pos not in self.values:
+            return 0
+        elif i_pos in self.values[v_pos]:
+            return 1
+        else:
+            return 0
+        
+    def set_value(self, v_pos, i_pos, value):
+        # Sets the value at the given V-stream and I-stream positions.
+        if value == 0:
+            if v_pos in self.values and i_pos in self.values[v_pos]:
+                self.values[v_pos].remove(i_pos)
+        else:
+            if v_pos not in self.values:
+                self.values[v_pos] = set()
+            self.values[v_pos].add(i_pos)
+            
+    def rearrange(self, v_perm):
+        # Rearranges the V-stream axis according to the given permutation.
+        new_values = {}
+        for new_v_pos, old_v_pos in enumerate(v_perm):
+            if old_v_pos in self.values:
+                new_values[new_v_pos] = self.values[old_v_pos]
+        self.values = new_values
+This implementation includes a rearrange method that takes a permutation of the V-stream axis (i.e., a list of integers indicating the new positions of each element in the V-stream), and rearranges the values in the crum accordingly. The rearrange method creates a new dictionary of values, where the keys are the new V-stream positions and the values are the corresponding I-stream positions. It then replaces the values attribute with the new dictionary.
+
+Note that this implementation assumes that the permutation is a list of integers. If your use case requires a different representation, you may need to modify the implementation accordingly. Additionally, this implementation does not include methods for manipulating the poomfilade structure at the level of the entire data structure (i.e., for rearranging the I-stream axis or adding or removing crums), as those operations were not described in the original definition of the Crum class.
+
+
+
+
+
+User
+include methods for manipulating the poomfilade structure at the level of the entire data structure (i.e., for rearranging the I-stream axis or adding or removing crums),
+ChatGPT
+Here is an updated implementation of the Crum class that includes methods for manipulating the poomfilade structure at the level of the entire data structure:
+
+python
+Copy code
+class Crum:
+    def __init__(self, disps, wids):
+        self.disps = disps  # an ordered pair of tumblers representing the position of the rectangle in tumbler space
+        self.wids = wids  # an ordered pair of tumblers representing the width and height of the rectangle in tumbler space
+        self.values = {}  # dictionary to store the "1"s in the crum
+        
+    def get_value(self, v_pos, i_pos):
+        # Returns the value at the given V-stream and I-stream positions.
+        # A "1" at a given coordinate indicates that the orgl realized by the matrix maps that coordinate’s V-stream axis location to and from its I-stream axis location.
+        if v_pos not in self.values:
+            return 0
+        elif i_pos in self.values[v_pos]:
+            return 1
+        else:
+            return 0
+        
+    def set_value(self, v_pos, i_pos, value):
+        # Sets the value at the given V-stream and I-stream positions.
+        if value == 0:
+            if v_pos in self.values and i_pos in self.values[v_pos]:
+                self.values[v_pos].remove(i_pos)
+        else:
+            if v_pos not in self.values:
+                self.values[v_pos] = set()
+            self.values[v_pos].add(i_pos)
+            
+    def rearrange(self, v_perm):
+        # Rearranges the V-stream axis according to the given permutation.
+        new_values = {}
+        for new_v_pos, old_v_pos in enumerate(v_perm):
+            if old_v_pos in self.values:
+                new_values[new_v_pos] = self.values[old_v_pos]
+        self.values = new_values
+        
+    def add_row(self, i_pos):
+        # Adds a new row to the crum with a "1" at the given I-stream position.
+        for v_pos in self.values:
+            self.values[v_pos].add(i_pos)
+            
+    def remove_row(self, i_pos):
+        # Removes the row from the crum with a "1" at the given I-stream position.
+        for v_pos in self.values:
+            if i_pos in self.values[v_pos]:
+                self.values[v_pos].remove(i_pos)
+                
+    def add_column(self, v_pos):
+        # Adds a new column to the crum with "0"s everywhere except at the given V-stream position.
+        self.values[v_pos] = set([i_pos for i_pos in range(self.disps[1], self.disps[1] + self.wids[1])])
+        
+    def remove_column(self, v_pos):
+        # Removes the column from the crum at the given V-stream position.
+        del self.values[v_pos]
+This implementation includes methods for adding and removing rows and columns to the Crum object, as well as a method for rearranging the V-stream axis at the crum level.
+
+The add_row method adds a new row to the crum with a "1" at the given I-stream position, by setting the value at that position to "1" for every V-stream position in the values dictionary.
+
+The remove_row method removes the row from the crum with a "1" at the given I-stream position, by removing the value at that position for every V-stream position in the values dictionary.
+
+The add_column method adds a new column to the crum with "0"s everywhere except at the given V-stream position, by creating a new
+
+
+
+
+
+User
+THE DIV POOM5h1
+5h2The DIV poom is an extended design for the poomfilade that is planned but not yet implemented. The DIV poom is similar to the poom, but adds a third dimension to enable the determination of the orgl of origin of material that has been virtually copied. The third dimension is orgl (or “document”, for historical reasons, hence the “D”) of origin of the I-span. Bottom crums are still planar identity matrices, but associated with each is a position on the I-stream corresponding to orgl of origin for the span represented. Upper crums represent three-dimensional bounding rectangular prisms, although the enfilade is otherwise the same as the basic poomfilade.
+ChatGPT
+Here's an implementation of the DivCrum class for the DIV poomfilade data structure in Python:
+
+python
+Copy code
+class DivCrum:
+    def __init__(self, disps, wids, orgl):
+        self.disps = disps  # an ordered triple of tumblers representing the position of the rectangular prism in tumbler space
+        self.wids = wids  # an ordered triple of tumblers representing the width, height, and depth of the rectangular prism in tumbler space
+        self.orgl = orgl  # the orgl of origin of the I-span represented by this crum
+        self.values = {}  # dictionary to store the "1"s in the crum
+        
+    def get_value(self, v_pos, i_pos, o_pos):
+        # Returns the value at the given V-stream, I-stream, and orgl positions.
+        # A "1" at a given coordinate indicates that the orgl realized by the matrix maps that coordinate’s V-stream axis location to and from its I-stream and orgl axis locations.
+        if v_pos not in self.values:
+            return 0
+        elif (i_pos, o_pos) in self.values[v_pos]:
+            return 1
+        else:
+            return 0
+        
+    def set_value(self, v_pos, i_pos, o_pos, value):
+        # Sets the value at the given V-stream, I-stream, and orgl positions.
+        if value == 0:
+            if v_pos in self.values and (i_pos, o_pos) in self.values[v_pos]:
+                self.values[v_pos].remove((i_pos, o_pos))
+        else:
+            if v_pos not in self.values:
+                self.values[v_pos] = set()
+            self.values[v_pos].add((i_pos, o_pos))
+            
+    def rearrange(self, v_perm):
+        # Rearranges the V-stream axis according to the given permutation.
+        new_values = {}
+        for new_v_pos, old_v_pos in enumerate(v_perm):
+            if old_v_pos in self.values:
+                new_values[new_v_pos] = self.values[old_v_pos]
+        self.values = new_values
+This implementation is similar to the Crum class for the poomfilade data structure, but includes an additional orgl attribute to represent the orgl of origin of the I-span represented by the crum. The get_value and set_value methods take an additional o_pos argument for the orgl position. The rearrange method is the same as in the Crum class.
+
+Note that this is just an example implementation of the DivCrum class, and it may need to be modified to suit your specific use case. Additionally, this implementation does not include methods for manipulating the DIV poomfilade structure at the level of the entire data structure (i.e., for rearranging the I-stream or orgl axis or adding or removing crums), as those operations were not described in the original definition of the DivCrum class.
+
+
+
+
+
+User
+include methods for manipulating the DIV poomfilade structure at the level of the entire data structure (i.e., for rearranging the I-stream or orgl axis or adding or removing crums)
+ChatGPT
+Here is an updated implementation of the DivCrum class that includes methods for manipulating the DIV poomfilade structure at the level of the entire data structure:
+
+python
+Copy code
+class DivCrum:
+    def __init__(self, disps, wids, orgl):
+        self.disps = disps  # an ordered triple of tumblers representing the position of the rectangular prism in tumbler space
+        self.wids = wids  # an ordered triple of tumblers representing the width, height, and depth of the rectangular prism in tumbler space
+        self.orgl = orgl  # the orgl of origin of the I-span represented by this crum
+        self.values = {}  # dictionary to store the "1"s in the crum
+        
+    def get_value(self, v_pos, i_pos, o_pos):
+        # Returns the value at the given V-stream, I-stream, and orgl positions.
+        # A "1" at a given coordinate indicates that the orgl realized by the matrix maps that coordinate’s V-stream axis location to and from its I-stream and orgl axis locations.
+        if v_pos not in self.values:
+            return 0
+        elif (i_pos, o_pos) in self.values[v_pos]:
+            return 1
+        else:
+            return 0
+        
+    def set_value(self, v_pos, i_pos, o_pos, value):
+        # Sets the value at the given V-stream, I-stream, and orgl positions.
+        if value == 0:
+            if v_pos in self.values and (i_pos, o_pos) in self.values[v_pos]:
+                self.values[v_pos].remove((i_pos, o_pos))
+        else:
+            if v_pos not in self.values:
+                self.values[v_pos] = set()
+            self.values[v_pos].add((i_pos, o_pos))
+            
+    def rearrange_v(self, v_perm):
+        # Rearranges the V-stream axis according to the given permutation.
+        new_values = {}
+        for new_v_pos, old_v_pos in enumerate(v_perm):
+            if old_v_pos in self.values:
+                new_values[new_v_pos] = self.values[old_v_pos]
+        self.values = new_values
+        
+    def rearrange_i(self, i_perm):
+        # Rearranges the I-stream axis according to the given permutation.
+        new_values = {}
+        for v_pos in self.values:
+            new_row = {}
+            for i_pos, o_pos in self.values[v_pos]:
+                new_i_pos = i_perm.index(i_pos)
+                new_row[new_i_pos] = o_pos
+            new_values[v_pos] = set(new_row.items())
+        self.values = new_values
+        
+    def rearrange_o(self, o_perm):
+        # Rearranges the orgl axis according to the given permutation.
+        new_values = {}
+        for v_pos in self.values:
+            new_row = {}
+            for i_pos, o_pos in self.values[v_pos]:
+                new_o_pos = o_perm.index(o_pos)
+                new_row[i_pos] = new_o_pos
+            new_values[v_pos] = set(new_row.items())
+        self.values = new_values
+        
+    def add_row(self, i_pos, o_pos):
+        # Adds a new row to the crum with a "1" at the given I-stream and orgl positions.
+        for v_pos in self.values:
+            self.values[v_pos].add((i_pos, o_pos))
+            
+    def remove_row(self, i_pos, o_pos):
+        # Removes the row from the crum with a "1" at the given I-stream and orgl positions.
+        for v_pos in self.values:
+            if (i_pos, o
+
+
+
+
+User
+please write that as a technical specification for a senior python programmer
+ChatGPT
+Sure, here is a technical specification for a senior Python programmer to implement methods for manipulating the DIV poomfilade structure at the level of the entire data structure:
+
+Background
+The DIV poomfilade is an extended design for the poomfilade data structure. It is similar to the poomfilade, but adds a third dimension to enable the determination of the orgl of origin of material that has been virtually copied. The third dimension is orgl of origin of the I-span, represented as a separate axis. The DIV poomfilade consists of a series of DivCrum objects, each representing a three-dimensional rectangular prism in tumbler space. The DivCrum objects contain a dictionary values that represents the "1"s in the crum, with each key representing a V-stream position and each value representing a set of tuples, where each tuple contains an I-stream position and an orgl position.
+
+Goal
+The goal of this project is to implement methods for manipulating the DIV poomfilade structure at the level of the entire data structure, including rearranging the I-stream or orgl axis, and adding or removing crums.
+
+Requirements
+The following requirements should be met:
+
+Implement a method rearrange_i(self, i_perm) that rearranges the I-stream axis according to the given permutation. The method should take a list i_perm representing the new ordering of I-stream positions, and update the values dictionary of each DivCrum object in the DIV poomfilade to reflect the new ordering. The method should preserve the orgl axis positions of the I-spans represented by each DivCrum object.
+
+Implement a method rearrange_o(self, o_perm) that rearranges the orgl axis according to the given permutation. The method should take a list o_perm representing the new ordering of orgl positions, and update the values dictionary of each DivCrum object in the DIV poomfilade to reflect the new ordering. The method should preserve the I-stream positions of the I-spans represented by each DivCrum object.
+
+Implement a method add_crum(self, disps, wids, orgl) that adds a new DivCrum object to the DIV poomfilade. The method should take an ordered triple of tumblers disps representing the position of the rectangular prism in tumbler space, an ordered triple of tumblers wids representing the width, height, and depth of the rectangular prism in tumbler space, and an orgl position orgl representing the orgl of origin of the I-span represented by the crum. The method should initialize the values dictionary of the new DivCrum object to an empty dictionary.
+
+Implement a method remove_crum(self, disps) that removes the DivCrum object at the given position from the DIV poomfilade. The method should take an ordered triple of tumblers disps representing the position of the rectangular prism in tumbler space. The method should remove the DivCrum object at the given position from the DIV poomfilade, and update the disps attribute of all subsequent DivCrum objects to reflect the new ordering.
+
+Acceptance Criteria
+The following acceptance criteria should be met:
+
+The rearrange_i method should correctly update the values dictionary of each DivCrum object in the DIV poomfilade to reflect the new ordering of I-stream positions.
+The rearrange_o method should correctly update the
+
+
+
+
+User
+please continue
+ChatGPT
+values dictionary of each DivCrum object in the DIV poomfilade to reflect the new ordering of orgl positions.
+3. The add_crum method should correctly add a new DivCrum object to the DIV poomfilade with the given position, width, height, depth, and orgl of origin, and an empty values dictionary.
+
+The remove_crum method should correctly remove the DivCrum object at the given position from the DIV poomfilade, and update the disps attribute of all subsequent DivCrum objects to reflect the new ordering.
+Constraints
+The following constraints should be considered:
+
+The input lists i_perm and o_perm in the rearrange_i and rearrange_o methods, respectively, should be of the same length as the current number of I-stream and orgl positions in the DIV poomfilade, respectively.
+The input ordered triple of tumblers disps in the add_crum and remove_crum methods should be a valid position in tumbler space that is not already occupied by an existing DivCrum object.
+The remove_crum method should only remove DivCrum objects that exist in the DIV poomfilade.
+Deliverables
+The following deliverables should be provided:
+
+An updated implementation of the DivCrum class that includes the methods described above.
+A test suite that verifies that the methods meet the acceptance criteria and constraints.
+Documentation that describes the purpose and usage of each method.
+
+
+
+
+User
+An updated implementation of the DivCrum class that includes the methods described above.
+ChatGPT
+Here's an updated implementation of the DivCrum class that includes the methods for manipulating the DIV poomfilade structure at the level of the entire data structure:
+
+python
+Copy code
+class DivCrum:
+    def __init__(self, disps, wids, orgl):
+        self.disps = disps  # an ordered triple of tumblers representing the position of the rectangular prism in tumbler space
+        self.wids = wids  # an ordered triple of tumblers representing the width, height, and depth of the rectangular prism in tumbler space
+        self.orgl = orgl  # the orgl of origin of the I-span represented by this crum
+        self.values = {}  # dictionary to store the "1"s in the crum
+        
+    def get_value(self, v_pos, i_pos, o_pos):
+        # Returns the value at the given V-stream, I-stream, and orgl positions.
+        # A "1" at a given coordinate indicates that the orgl realized by the matrix maps that coordinate’s V-stream axis location to and from its I-stream and orgl axis locations.
+        if v_pos not in self.values:
+            return 0
+        elif (i_pos, o_pos) in self.values[v_pos]:
+            return 1
+        else:
+            return 0
+        
+    def set_value(self, v_pos, i_pos, o_pos, value):
+        # Sets the value at the given V-stream, I-stream, and orgl positions.
+        if value == 0:
+            if v_pos in self.values and (i_pos, o_pos) in self.values[v_pos]:
+                self.values[v_pos].remove((i_pos, o_pos))
+        else:
+            if v_pos not in self.values:
+                self.values[v_pos] = set()
+            self.values[v_pos].add((i_pos, o_pos))
+            
+    def rearrange_v(self, v_perm):
+        # Rearranges the V-stream axis according to the given permutation.
+        new_values = {}
+        for new_v_pos, old_v_pos in enumerate(v_perm):
+            if old_v_pos in self.values:
+                new_values[new_v_pos] = self.values[old_v_pos]
+        self.values = new_values
+        
+    def rearrange_i(self, i_perm):
+        # Rearranges the I-stream axis according to the given permutation.
+        new_values = {}
+        for v_pos in self.values:
+            new_row = {}
+            for i_pos, o_pos in self.values[v_pos]:
+                new_i_pos = i_perm.index(i_pos)
+                new_row[new_i_pos] = o_pos
+            new_values[v_pos] = set(new_row.items())
+        self.values = new_values
+        
+    def rearrange_o(self, o_perm):
+        # Rearranges the orgl axis according to the given permutation.
+        new_values = {}
+        for v_pos in self.values:
+            new_row = {}
+            for i_pos, o_pos in self.values[v_pos]:
+                new_o_pos = o_perm.index(o_pos)
+                new_row[i_pos] = new_o_pos
+            new_values[v_pos] = set(new_row.items())
+        self.values = new_values
+        
+    def add_row(self, i_pos, o_pos):
+        # Adds a new row to the crum with a "1" at the given I-stream and orgl positions.
+        for v_pos in self.values:
+            self.values[v_pos].add((i_pos, o_pos))
+            
+    def remove_row(self, i_pos, o_pos):
+        # Removes the row from the crum with a "1" at the given I-stream and orgl positions.
+        for v_pos in self.values:
+            if (i_pos
+
+
+
+
+User
+please continue the code block
+ChatGPT
+, o_pos) in self.values[v_pos]:
+self.values[v_pos].remove((i_pos, o_pos))
+
+ruby
+Copy code
+def add_crum(self, disps, wids, orgl):
+    # Adds a new crum to the DIV poomfilade at the given position with the given width, height, depth, and orgl of origin.
+    new_crum = DivCrum(disps, wids, orgl)
+    # TODO: Insert the new crum into the DIV poomfilade.
+    
+def remove_crum(self, disps):
+    # Removes the crum from the DIV poomfilade at the given position.
+    # TODO: Remove the crum from the DIV poomfilade and update the disps attribute of all subsequent crums to reflect the new ordering.
+javascript
+Copy code
+
+Note that the `add_crum` and `remove_crum` methods are not fully implemented, as they
